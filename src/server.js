@@ -1,55 +1,85 @@
 //imports express
 const express = require ("express");
 //created constant which is an instance of express
-const app = express();
+//const app = express();
+const fs = require ("fs")
+const path = require ('path')
 
+//const {myFunction, myOtherFunction}
+
+const app = express();
+const public_directory = path.join(__dirname, "../public")
 
 app.use(express.json());
+//app.use(myFunction);
+//app.use(myOtherFunction);
+app.use(express.static(public_directory));
 
 
-app.get("/", (req, res) => {
-    console.log("logging something cool");
-    res.send("hello fergus");
-});
+console.log(public_directory)
 
-app.get("/yo", (req, res) => {
-    res.send("im a software developer");
-});
+const myFunction = (req, res, next) => {
+console.log("this happens first")
+req.query.random = "something random"
+next()
+}
 
-app.get("/data", (req, res) => {
-    res.send ({data: "hello fergus"});
-});
+const myOtherFunction = (req, res, next) => {
+    console.log("this happens second")
+req.query.morestuff = "something else";
+next();
+}
 
-
-app.get("/info", (req, res) => {
+app.get("/", [myFunction, myOtherFunction], (req, res) => {
+    console.log("...then running controller");
     console.log(req.query);
-    res.send({message: req.query})
-})
+    res.send({ message: `Hello, welcome ${req.query.name}`});
+}); 
 
-app.get("/dog", (req, res) => {
-    res.send("woof")
-})
+ 
+// app.get("/yo", (req, res) => {
+//     res.send("im a software developer");
+// });
 
-app.get("/dog/:id/:name", (req, res) => {
-    console.log(req.params);
-    res.send("success")
-})
+// app.get("/data", (req, res) => {
+//     res.send ({data: "hello fergus"});
+// });
 
-//get request for local host person id 
-app.get("/person/:id", (req, res) => {
-    //logs the parameter id 
-    console.log(req.params.id);
-    res.send("success")
-})
 
-app.post ("/", (req, res) => {
-    console.log(req.body);
-    res.send({ data: req.body });
-})
+// app.get("/info", (req, res) => {
+//     console.log(req.query);
+//     res.send({message: req.query})
+// })
 
-app.post ("/person", (req, res) => {
-    console.log(req.body.name);
-    res.send({ data: req.body });
+// app.get("/dog", (req, res) => {
+//     res.send("woof")
+// })
+
+// app.get("/dog/:id/:name", (req, res) => {
+//     console.log(req.params);
+//     res.send("success")
+// })
+
+// //get request for local host person id 
+// app.get("/person/:id", (req, res) => {
+//     //logs the parameter id 
+//     console.log(req.params.id);
+//     res.send("success")
+// })
+
+// app.post ("/", (req, res) => {
+//     console.log(req.body);
+//     res.send({ data: req.body });
+// })
+
+// app.post ("/person", (req, res) => {
+//     console.log(req.body.name);
+//     res.send({ data: req.body });
+// })
+
+app.post ("/task", (req, res) => {
+    fs.writeFileSync("task.txt", req.body.task);
+    res.send( "Success" )
 })
 
 //app.listen(aPortNumber, aCallBackFunction)
